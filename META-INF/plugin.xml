@@ -1,0 +1,61 @@
+<idea-plugin version="2" url="https://github.com/idok/sass-lint-plugin">
+    <id>com.wix.sasslint</id>
+    <name>Sass Lint</name>
+    <version>1.0.0</version>
+    <vendor email="sir_simon_x@yahoo.com" url="https://github.com/idok">Ido</vendor>
+    <category>HTML/JavaScript Development</category>
+    <description><![CDATA[
+      Sass Lint intellij integration.<br>
+      <p>Support displaying Sass Lint warnings as intellij inspections</p>
+      <p>Support for custom Sass Lint rules</p>
+    ]]></description>
+
+    <change-notes><![CDATA[
+       <p>1.0.0 First version.</p>
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.lang</depends>
+    <!--<depends>com.intellij.modules.platform</depends>-->
+    <depends>org.jetbrains.plugins.sass</depends>
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="139"/>
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <projectService serviceImplementation="com.sasslint.settings.Settings"/>
+        <projectConfigurable implementation="com.sasslint.settings.SassLintSettingsPage"/>
+        <localInspection language="SCSS" groupPath="JavaScript" shortName="SassLintInspection"
+                         enabledByDefault="true" level="ERROR"
+                         bundle="com.sasslint.SassLintBundle"
+                         implementationClass="com.sasslint.inspection.SassLintInspection"
+                         displayName="SassLint" groupKey="sasslint.inspection.group.name"/>
+        <!--unfair="true" runForWholeFile="true" level="WARNING" -->
+        <externalAnnotator language="SCSS" implementationClass="com.sasslint.inspection.SassLintExternalAnnotator" />
+
+        <!-- annotate config file -->
+        <projectService serviceImplementation="com.sasslint.config.SassLintConfigFileListener"/>
+    </extensions>
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+        <component>
+            <implementation-class>com.sasslint.SassLintProjectComponent</implementation-class>
+        </component>
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+
+</idea-plugin>
