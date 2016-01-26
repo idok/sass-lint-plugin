@@ -275,7 +275,7 @@ public class SassLintSettingsPage implements Configurable {
     @Nls
     @Override
     public String getDisplayName() {
-        return "SassLint";
+        return "Sass Lint";
     }
 
     @Nullable
