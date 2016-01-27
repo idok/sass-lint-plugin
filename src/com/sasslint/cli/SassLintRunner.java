@@ -1,5 +1,6 @@
 package com.sasslint.cli;
 
+import com.google.common.base.Strings;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.ProcessOutput;
@@ -50,19 +51,22 @@ public final class SassLintRunner {
         LintResult result = new LintResult();
         try {
             GeneralCommandLine commandLine = createCommandLineLint(settings);
-            CLI.addParam(commandLine, "--format", "checkstyle");
             ProcessOutput out = NodeRunner.execute(commandLine, TIME_OUT);
-//            if (out.getExitCode() != 0) {
+            if (out.getExitCode() == 0) {
                 result.errorOutput = out.getStderr();
                 try {
-                    result.sassLint = SassLint.read(out.getStdout());
+                    if (Strings.isNullOrEmpty(out.getStdout())) {
+                        LOG.debug("SASS-Lint Empty output");
+                    } else {
+                        result.sassLint = SassLint.read(out.getStdout());
+                    }
                 } catch (Exception e) {
                     LOG.error(e);
                     //result.errorOutput = out.getStdout();
                 }
-//            } else {
-//                LOG.debug("");
-//            }
+            } else {
+                result.errorOutput = out.getStderr();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result.errorOutput = e.toString();
@@ -102,8 +106,7 @@ public final class SassLintRunner {
         commandLine.addParameter(settings.targetFile);
         commandLine.addParameter("-v");
         CLI.addParamIfNotEmpty(commandLine, "-c", settings.config);
-        CLI.addParamIfNotEmpty(commandLine, "--rules", settings.rules);
-        CLI.addParamIfNotEmpty(commandLine, "--ext", settings.extensions);
+        CLI.addParam(commandLine, "--format", "checkstyle");
         return commandLine;
     }
 }

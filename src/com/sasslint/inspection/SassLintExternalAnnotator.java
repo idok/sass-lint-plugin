@@ -49,7 +49,7 @@ public class SassLintExternalAnnotator extends ExternalAnnotator<ExternalLintAnn
 
     public static final SassLintExternalAnnotator INSTANCE = new SassLintExternalAnnotator();
     private static final Logger LOG = Logger.getInstance(SassLintBundle.LOG_ID);
-    private static final String MESSAGE_PREFIX = "SassLint: ";
+    private static final String MESSAGE_PREFIX = "Sass Lint: ";
     private static final Key<ThreadLocalTempActualFile> SASS_LINT_TEMP_FILE = Key.create("SASS_LINT_TEMP_FILE");
 
     @Nullable
@@ -201,7 +201,7 @@ public class SassLintExternalAnnotator extends ExternalAnnotator<ExternalLintAnn
             }
             relativeFile = FileUtils.makeRelative(new File(file.getProject().getBasePath()), actualCodeFile.getActualFile());
             if (relativeFile == null) {
-                LOG.error("Error running SassLint inspection: relative file path is null");
+                LOG.error("Error running Sass Lint inspection: relative file path is null");
                 return null;
             }
             LintResult result = SassLintRunner.lint(file.getProject().getBasePath(), relativeFile, component.nodeInterpreter, component.lintExecutable, component.configFile, component.customRulesPath, component.extensions);
@@ -213,14 +213,14 @@ public class SassLintExternalAnnotator extends ExternalAnnotator<ExternalLintAnn
             }
             Document document = PsiDocumentManager.getInstance(file.getProject()).getDocument(file);
             if (document == null) {
-                component.showInfoNotification("Error running SassLint inspection: Could not get document for file " + file.getName(), NotificationType.WARNING);
+                component.showInfoNotification("Error running Sass Lint inspection: Could not get document for file " + file.getName(), NotificationType.WARNING);
                 LOG.error("Could not get document for file " + file.getName());
                 return null;
             }
             return new ExternalLintAnnotationResult<LintResult>(collectedInfo, result);
         } catch (Exception e) {
-            LOG.error("Error running SassLint inspection: ", e);
-            showNotification("Error running SassLint inspection: " + e.getMessage(), NotificationType.ERROR);
+            LOG.error("Error running Sass Lint inspection: ", e);
+            showNotification("Error running Sass Lint inspection: " + e.getMessage(), NotificationType.ERROR);
         } finally {
             if (actualCodeFile != null) {
                 actualCodeFile.deleteTemp();

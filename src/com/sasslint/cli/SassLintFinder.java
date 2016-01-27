@@ -1,19 +1,18 @@
 package com.sasslint.cli;
 
-import com.sasslint.config.SassLintConfigFileType;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
+import com.sasslint.config.SassLintConfigFileUtil;
 import com.wix.nodejs.NodeFinder;
 import com.wix.utils.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.*;
+import java.util.List;
 
 public final class SassLintFinder {
-    public static final String SASS_LINT_BASE_NAME = SystemInfo.isWindows ? "sass-lint.cmd" : "sass-lint";
+    public static final String SASS_LINT_BASE_NAME = NodeFinder.getBinName("sass-lint");
 
     private SassLintFinder() {
     }
@@ -25,7 +24,6 @@ public final class SassLintFinder {
 
     /**
      * find possible sasslint rc files
-     *
      * @param projectRoot
      * @return
      */
@@ -33,10 +31,9 @@ public final class SassLintFinder {
         FilenameFilter filter = new FilenameFilter() {
             @Override
             public boolean accept(File file, String name) {
-                return name.equals(SassLintConfigFileType.SASS_LINT_CONFIG);
+                return name.equals(SassLintConfigFileUtil.SASS_LINT_CONFIG);
             }
         };
-        // return Arrays.asList(files);
         List<String> files = FileUtils.recursiveVisitor(projectRoot, filter);
         return ContainerUtil.map(files, new Function<String, String>() {
             public String fun(String curFile) {

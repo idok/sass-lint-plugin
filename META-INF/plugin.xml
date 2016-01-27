@@ -1,16 +1,16 @@
 <idea-plugin version="2" url="https://github.com/idok/sass-lint-plugin">
     <id>com.wix.sasslint</id>
     <name>Sass Lint</name>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <vendor email="sir_simon_x@yahoo.com" url="https://github.com/idok">Ido</vendor>
     <category>HTML/JavaScript Development</category>
     <description><![CDATA[
       Sass Lint intellij integration.<br>
       <p>Support displaying Sass Lint warnings as intellij inspections</p>
-      <p>Support for custom Sass Lint rules</p>
     ]]></description>
 
     <change-notes><![CDATA[
+       <p>1.0.1 Bug fixes.</p>
        <p>1.0.0 First version.</p>
     ]]></change-notes>
 

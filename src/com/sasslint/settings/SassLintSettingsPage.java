@@ -1,17 +1,12 @@
 package com.sasslint.settings;
 
-import com.sasslint.SassLintProjectComponent;
-import com.sasslint.cli.SassLintFinder;
-import com.sasslint.cli.SassLintRunner;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.execution.ExecutionException;
-//import com.intellij.javascript.nodejs.NodeDetectionUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.HyperlinkLabel;
@@ -20,8 +15,12 @@ import com.intellij.ui.TextFieldWithHistoryWithBrowseButton;
 import com.intellij.util.NotNullProducer;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.webcore.ui.SwingHelper;
+import com.sasslint.SassLintProjectComponent;
+import com.sasslint.cli.SassLintFinder;
+import com.sasslint.cli.SassLintRunner;
 import com.wix.nodejs.NodeDetectionUtil;
-import com.wix.settings.ValidationInfo;
+import com.wix.settings.ValidationUtils;
+import com.wix.settings.Validator;
 import com.wix.ui.PackagesNotificationPanel;
 import com.wix.utils.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -35,50 +34,55 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SassLintSettingsPage implements Configurable {
     public static final String FIX_IT = "Fix it";
-    public static final String HOW_TO_USE_SASS_LINT = "How to Use SassLint";
+    public static final String HOW_TO_USE_SASS_LINT = "How to Use Sass Lint";
     public static final String HOW_TO_USE_LINK = "https://github.com/idok/sass-lint-plugin";
-    protected Project project;
+    protected final Project project;
 
     private JCheckBox pluginEnabledCheckbox;
-    private JTextField customRulesPathField;
+    //    private JTextField customRulesPathField;
     private JPanel panel;
     private JPanel errorPanel;
     private TextFieldWithHistoryWithBrowseButton sasslintBinField;
     private TextFieldWithHistoryWithBrowseButton nodeInterpreterField;
-    private TextFieldWithHistoryWithBrowseButton sasslintrcFile;
-    private JRadioButton searchForLintrcInRadioButton;
-    private JRadioButton useProjectLintrcRadioButton;
+    private TextFieldWithHistoryWithBrowseButton sassLintConfigFile;
+    private JRadioButton searchConfigRadioButton;
+    private JRadioButton useProjectConfigRadioButton;
     private HyperlinkLabel usageLink;
     private JLabel sassLintConfigFilePathLabel;
-    private JLabel rulesDirectoryLabel;
+    //    private JLabel rulesDirectoryLabel;
     private JLabel pathToSasslintBinLabel;
     private JLabel nodeInterpreterLabel;
     private JLabel versionLabel;
-    //    private TextFieldWithHistoryWithBrowseButton rulesPathField;
-//    private JLabel rulesDirectoryLabel1;
+    // private TextFieldWithHistoryWithBrowseButton rulesPathField;
+    // private JLabel rulesDirectoryLabel1;
     private final PackagesNotificationPanel packagesNotificationPanel;
+
+    private final JComponent[] comps = {
+        sassLintConfigFile,
+        // customRulesPathField,
+        searchConfigRadioButton,
+        useProjectConfigRadioButton,
+        sasslintBinField,
+        nodeInterpreterField,
+        sassLintConfigFilePathLabel,
+        // rulesDirectoryLabel,
+        pathToSasslintBinLabel,
+        nodeInterpreterLabel
+    };
 
     public SassLintSettingsPage(@NotNull final Project project) {
         this.project = project;
         configLintBinField();
         configConfigFileField();
-//        configESLintRulesField();
         configNodeField();
-//        searchForLintrcInRadioButton.addItemListener(new ItemListener() {
-//            public void itemStateChanged(ItemEvent e) {
-//                sasslintrcFile.setEnabled(e.getStateChange() == ItemEvent.DESELECTED);
-//                System.out.println("searchForLintrcInRadioButton: " + (e.getStateChange() == ItemEvent.SELECTED ? "checked" : "unchecked"));
-//            }
-//        });
-        useProjectLintrcRadioButton.addItemListener(new ItemListener() {
+        useProjectConfigRadioButton.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                sasslintrcFile.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-//                System.out.println("useProjectLintrcRadioButton: " + (e.getStateChange() == ItemEvent.SELECTED ? "checked" : "unchecked"));
+                sassLintConfigFile.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+//                System.out.println("useProjectConfigRadioButton: " + (e.getStateChange() == ItemEvent.SELECTED ? "checked" : "unchecked"));
             }
         });
         pluginEnabledCheckbox.addItemListener(new ItemListener() {
@@ -100,10 +104,9 @@ public class SassLintSettingsPage implements Configurable {
             }
         };
         sasslintBinField.getChildComponent().getTextEditor().getDocument().addDocumentListener(docAdp);
-        sasslintrcFile.getChildComponent().getTextEditor().getDocument().addDocumentListener(docAdp);
+        sassLintConfigFile.getChildComponent().getTextEditor().getDocument().addDocumentListener(docAdp);
         nodeInterpreterField.getChildComponent().getTextEditor().getDocument().addDocumentListener(docAdp);
-//        rulesPathField.getChildComponent().getTextEditor().getDocument().addDocumentListener(docAdp);
-        customRulesPathField.getDocument().addDocumentListener(docAdp);
+//        customRulesPathField.getDocument().addDocumentListener(docAdp);
     }
 
     private File getProjectPath() {
@@ -124,22 +127,26 @@ public class SassLintSettingsPage implements Configurable {
     }
 
     private void setEnabledState(boolean enabled) {
-        sasslintrcFile.setEnabled(enabled);
-        customRulesPathField.setEnabled(enabled);
-        searchForLintrcInRadioButton.setEnabled(enabled);
-        useProjectLintrcRadioButton.setEnabled(enabled);
-        sasslintBinField.setEnabled(enabled);
-        nodeInterpreterField.setEnabled(enabled);
-        sassLintConfigFilePathLabel.setEnabled(enabled);
-        rulesDirectoryLabel.setEnabled(enabled);
-        pathToSasslintBinLabel.setEnabled(enabled);
-        nodeInterpreterLabel.setEnabled(enabled);
+//        sassLintConfigFile.setEnabled(enabled);
+////        customRulesPathField.setEnabled(enabled);
+//        searchConfigRadioButton.setEnabled(enabled);
+//        useProjectConfigRadioButton.setEnabled(enabled);
+//        sasslintBinField.setEnabled(enabled);
+//        nodeInterpreterField.setEnabled(enabled);
+//        sassLintConfigFilePathLabel.setEnabled(enabled);
+////        rulesDirectoryLabel.setEnabled(enabled);
+//        pathToSasslintBinLabel.setEnabled(enabled);
+//        nodeInterpreterLabel.setEnabled(enabled);
+
+//        private JComponent[] comps = {sasslintBinField};
+        for (JComponent c : comps) {
+            c.setEnabled(enabled);
+        }
     }
 
-    private void validateField(List<ValidationInfo> errors, TextFieldWithHistoryWithBrowseButton field, boolean allowEmpty, String message) {
-        if (!validatePath(field.getChildComponent().getText(), allowEmpty)) {
-            ValidationInfo error = new ValidationInfo(field.getChildComponent().getTextEditor(), message, FIX_IT);
-            errors.add(error);
+    private void validateField(Validator validator, TextFieldWithHistoryWithBrowseButton field, boolean allowEmpty, String message) {
+        if (!ValidationUtils.validatePath(project, field.getChildComponent().getText(), allowEmpty)) {
+            validator.add(field.getChildComponent().getTextEditor(), message, FIX_IT);
         }
     }
 
@@ -147,27 +154,26 @@ public class SassLintSettingsPage implements Configurable {
         if (!pluginEnabledCheckbox.isSelected()) {
             return;
         }
-        List<ValidationInfo> errors = new ArrayList<ValidationInfo>();
-        validateField(errors, sasslintBinField, false, "Path to sasslint is invalid {{LINK}}");
-        validateField(errors, sasslintrcFile, true, "Path to config file is invalid {{LINK}}"); //Please correct path to
-        validateField(errors, nodeInterpreterField, false, "Path to node interpreter is invalid {{LINK}}");
-        if (!validateDirectory(customRulesPathField.getText(), true)) {
-            ValidationInfo error = new ValidationInfo(customRulesPathField, "Path to custom rules is invalid {{LINK}}", FIX_IT);
-            errors.add(error);
-        }
-        if (errors.isEmpty()) {
+        Validator validator = new Validator();
+        validateField(validator, sasslintBinField, false, "Path to sass-lint is invalid {{LINK}}");
+        validateField(validator, sassLintConfigFile, true, "Path to config file is invalid {{LINK}}"); //Please correct path to
+        validateField(validator, nodeInterpreterField, false, "Path to node interpreter is invalid {{LINK}}");
+//        if (!ValidationUtils.validateDirectory(project, customRulesPathField.getText(), true)) {
+//            validator.add(customRulesPathField, "Path to custom rules is invalid {{LINK}}", FIX_IT);
+//        }
+        if (validator.hasErrors()) {
             getVersion();
         }
-        packagesNotificationPanel.processErrors(errors);
+        packagesNotificationPanel.processErrors(validator);
     }
 
     private SassLintRunner.SassLintSettings settings;
 
     private void getVersion() {
         if (settings != null &&
-            areEqual(nodeInterpreterField, settings.node) &&
-            areEqual(sasslintBinField, settings.executablePath) &&
-            settings.cwd.equals(project.getBasePath())
+                areEqual(nodeInterpreterField, settings.node) &&
+                areEqual(sasslintBinField, settings.executablePath) &&
+                settings.cwd.equals(project.getBasePath())
                 ) {
             return;
         }
@@ -181,42 +187,6 @@ public class SassLintSettingsPage implements Configurable {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-    }
-
-    private boolean validatePath(String path, boolean allowEmpty) {
-        if (StringUtils.isEmpty(path)) {
-            return allowEmpty;
-        }
-        File filePath = new File(path);
-        if (filePath.isAbsolute()) {
-            if (!filePath.exists() || !filePath.isFile()) {
-                return false;
-            }
-        } else {
-            VirtualFile child = project.getBaseDir().findFileByRelativePath(path);
-            if (child == null || !child.exists() || child.isDirectory()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean validateDirectory(String path, boolean allowEmpty) {
-        if (StringUtils.isEmpty(path)) {
-            return allowEmpty;
-        }
-        File filePath = new File(path);
-        if (filePath.isAbsolute()) {
-            if (!filePath.exists() || !filePath.isDirectory()) {
-                return false;
-            }
-        } else {
-            VirtualFile child = project.getBaseDir().findFileByRelativePath(path);
-            if (child == null || !child.exists() || !child.isDirectory()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private static TextFieldWithHistory configWithDefaults(TextFieldWithHistoryWithBrowseButton field) {
@@ -235,29 +205,18 @@ public class SassLintSettingsPage implements Configurable {
                 return FileUtils.toAbsolutePath(newFiles);
             }
         });
-        SwingHelper.installFileCompletionAndBrowseDialog(project, sasslintBinField, "Select SassLint cli", FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor());
+        SwingHelper.installFileCompletionAndBrowseDialog(project, sasslintBinField, "Select Sass Lint Exe", FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor());
     }
 
-//    private void configESLintRulesField() {
-//        TextFieldWithHistory textFieldWithHistory = rulesPathField.getChildComponent();
-//        SwingHelper.addHistoryOnExpansion(textFieldWithHistory, new NotNullProducer<List<String>>() {
-//            @NotNull
-//            public List<String> produce() {
-//                return SassLintFinder.tryFindRulesAsString(getProjectPath());
-//            }
-//        });
-//        SwingHelper.installFileCompletionAndBrowseDialog(project, rulesPathField, "Select Built in rules", FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor());
-//    }
-
     private void configConfigFileField() {
-        TextFieldWithHistory textFieldWithHistory = configWithDefaults(sasslintrcFile);
+        TextFieldWithHistory textFieldWithHistory = configWithDefaults(sassLintConfigFile);
         SwingHelper.addHistoryOnExpansion(textFieldWithHistory, new NotNullProducer<List<String>>() {
             @NotNull
             public List<String> produce() {
                 return SassLintFinder.searchForConfigFiles(getProjectPath());
             }
         });
-        SwingHelper.installFileCompletionAndBrowseDialog(project, sasslintrcFile, "Select SassLint config", FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor());
+        SwingHelper.installFileCompletionAndBrowseDialog(project, sassLintConfigFile, "Select Sass Lint Config", FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor());
     }
 
     private void configNodeField() {
@@ -269,7 +228,7 @@ public class SassLintSettingsPage implements Configurable {
                 return FileUtils.toAbsolutePath(newFiles);
             }
         });
-        SwingHelper.installFileCompletionAndBrowseDialog(project, nodeInterpreterField, "Select Node interpreter", FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor());
+        SwingHelper.installFileCompletionAndBrowseDialog(project, nodeInterpreterField, "Select Node Interpreter", FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor());
     }
 
     @Nls
@@ -301,12 +260,12 @@ public class SassLintSettingsPage implements Configurable {
         return pluginEnabledCheckbox.isSelected() != s.pluginEnabled ||
                 !areEqual(sasslintBinField, s.lintExecutable) ||
                 !areEqual(nodeInterpreterField, s.nodeInterpreter) ||
-                !customRulesPathField.getText().equals(s.rulesPath) ||
+//                !customRulesPathField.getText().equals(s.rulesPath) ||
                 !getConfigFile().equals(s.configFile);
     }
 
     private String getConfigFile() {
-        return useProjectLintrcRadioButton.isSelected() ? sasslintrcFile.getChildComponent().getText() : "";
+        return useProjectConfigRadioButton.isSelected() ? sassLintConfigFile.getChildComponent().getText() : "";
     }
 
     @Override
@@ -321,7 +280,7 @@ public class SassLintSettingsPage implements Configurable {
         settings.lintExecutable = sasslintBinField.getChildComponent().getText();
         settings.nodeInterpreter = nodeInterpreterField.getChildComponent().getText();
         settings.configFile = getConfigFile();
-        settings.rulesPath = customRulesPathField.getText();
+//        settings.rulesPath = customRulesPathField.getText();
         project.getComponent(SassLintProjectComponent.class).validateSettings();
         DaemonCodeAnalyzer.getInstance(project).restart();
     }
@@ -330,12 +289,12 @@ public class SassLintSettingsPage implements Configurable {
         Settings settings = getSettings();
         pluginEnabledCheckbox.setSelected(settings.pluginEnabled);
         sasslintBinField.getChildComponent().setText(settings.lintExecutable);
-        sasslintrcFile.getChildComponent().setText(settings.configFile);
+        sassLintConfigFile.getChildComponent().setText(settings.configFile);
         nodeInterpreterField.getChildComponent().setText(settings.nodeInterpreter);
-        customRulesPathField.setText(settings.rulesPath);
-        useProjectLintrcRadioButton.setSelected(StringUtils.isNotEmpty(settings.configFile));
-        searchForLintrcInRadioButton.setSelected(StringUtils.isEmpty(settings.configFile));
-        sasslintrcFile.setEnabled(useProjectLintrcRadioButton.isSelected());
+//        customRulesPathField.setText(settings.rulesPath);
+        useProjectConfigRadioButton.setSelected(StringUtils.isNotEmpty(settings.configFile));
+        searchConfigRadioButton.setSelected(StringUtils.isEmpty(settings.configFile));
+        sassLintConfigFile.setEnabled(useProjectConfigRadioButton.isSelected());
         setEnabledState(settings.pluginEnabled);
     }
 

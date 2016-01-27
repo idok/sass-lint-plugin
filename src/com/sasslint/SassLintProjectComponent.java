@@ -102,16 +102,6 @@ public class SassLintProjectComponent implements ProjectComponent {
         if (!status) {
             return false;
         }
-
-//        if (StringUtil.isNotEmpty(settings.lintExecutable)) {
-//            File file = new File(project.getBasePath(), settings.lintExecutable);
-//            if (!file.exists()) {
-//                showErrorConfigNotification(ESLintBundle.message("sasslint.rules.dir.does.not.exist", file.toString()));
-//                LOG.debug("Rules directory not found");
-//                settingValidStatus = false;
-//                return false;
-//            }
-//        }
         lintExecutable = settings.lintExecutable;
         configFile = settings.configFile;
         customRulesPath = settings.rulesPath;
@@ -120,9 +110,6 @@ public class SassLintProjectComponent implements ProjectComponent {
         treatAsWarnings = settings.treatAllIssuesAsWarnings;
         pluginEnabled = settings.pluginEnabled;
         extensions = settings.extensions;
-
-//        RuleCache.initializeFromPath(project, this);
-
         settingValidStatus = true;
         return true;
     }
