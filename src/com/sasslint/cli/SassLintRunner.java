@@ -105,6 +105,7 @@ public final class SassLintRunner {
         // TODO validate arguments (file exist etc)
         commandLine.addParameter(settings.targetFile);
         commandLine.addParameter("-v");
+        commandLine.addParameter("-q");
         CLI.addParamIfNotEmpty(commandLine, "-c", settings.config);
         CLI.addParam(commandLine, "--format", "checkstyle");
         return commandLine;
