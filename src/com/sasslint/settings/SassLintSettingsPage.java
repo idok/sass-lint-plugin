@@ -102,7 +102,27 @@ public class SassLintSettingsPage implements Configurable {
             protected void textChanged(DocumentEvent e) {
                 updateLaterInEDT();
             }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                super.changedUpdate(e);
+//                System.out.println("changedUpdate " + rtBinField.getText());
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                super.insertUpdate(e);
+//                System.out.println("insertUpdate " + rtBinField.getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+//                super.removeUpdate(e);
+//                e.getDocument().
+                System.out.println("removeUpdate ");
+            }
         };
+
         sasslintBinField.getChildComponent().getTextEditor().getDocument().addDocumentListener(docAdp);
         sassLintConfigFile.getChildComponent().getTextEditor().getDocument().addDocumentListener(docAdp);
         nodeInterpreterField.getChildComponent().getTextEditor().getDocument().addDocumentListener(docAdp);
@@ -184,7 +204,7 @@ public class SassLintSettingsPage implements Configurable {
         try {
             String version = SassLintRunner.runVersion(settings);
             versionLabel.setText(version.trim());
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
