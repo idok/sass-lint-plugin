@@ -130,7 +130,7 @@ public class SassLintSettingsPage implements Configurable {
     }
 
     private File getProjectPath() {
-        return new File(project.getBaseDir().getPath());
+        return project.getBasePath() == null ? null : new File(project.getBasePath());
     }
 
     private void updateLaterInEDT() {
@@ -294,18 +294,20 @@ public class SassLintSettingsPage implements Configurable {
         PsiManager.getInstance(project).dropResolveCaches();
     }
 
-    protected void saveSettings() {
+    private void saveSettings() {
         Settings settings = getSettings();
         settings.pluginEnabled = pluginEnabledCheckbox.isSelected();
         settings.lintExecutable = sasslintBinField.getChildComponent().getText();
         settings.nodeInterpreter = nodeInterpreterField.getChildComponent().getText();
         settings.configFile = getConfigFile();
 //        settings.rulesPath = customRulesPathField.getText();
-        project.getComponent(SassLintProjectComponent.class).validateSettings();
-        DaemonCodeAnalyzer.getInstance(project).restart();
+        if (!project.isDefault()) {
+            project.getComponent(SassLintProjectComponent.class).validateSettings();
+            DaemonCodeAnalyzer.getInstance(project).restart();
+        }
     }
 
-    protected void loadSettings() {
+    private void loadSettings() {
         Settings settings = getSettings();
         pluginEnabledCheckbox.setSelected(settings.pluginEnabled);
         sasslintBinField.getChildComponent().setText(settings.lintExecutable);
