@@ -119,7 +119,7 @@ public class SassLintSettingsPage implements Configurable {
             public void removeUpdate(DocumentEvent e) {
 //                super.removeUpdate(e);
 //                e.getDocument().
-                System.out.println("removeUpdate ");
+//                System.out.println("removeUpdate ");
             }
         };
 
@@ -181,7 +181,7 @@ public class SassLintSettingsPage implements Configurable {
 //        if (!ValidationUtils.validateDirectory(project, customRulesPathField.getText(), true)) {
 //            validator.add(customRulesPathField, "Path to custom rules is invalid {{LINK}}", FIX_IT);
 //        }
-        if (validator.hasErrors()) {
+        if (!validator.hasErrors()) {
             getVersion();
         }
         packagesNotificationPanel.processErrors(validator);
