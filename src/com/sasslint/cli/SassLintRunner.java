@@ -52,7 +52,7 @@ public final class SassLintRunner {
         try {
             GeneralCommandLine commandLine = createCommandLineLint(settings);
             ProcessOutput out = NodeRunner.execute(commandLine, TIME_OUT);
-            if (out.getExitCode() == 0) {
+//            if (out.getExitCode() == 0) {
                 result.errorOutput = out.getStderr();
                 try {
                     if (Strings.isNullOrEmpty(out.getStdout())) {
@@ -64,9 +64,9 @@ public final class SassLintRunner {
                     LOG.error(e);
                     //result.errorOutput = out.getStdout();
                 }
-            } else {
-                result.errorOutput = out.getStderr();
-            }
+//            } else {
+//                result.errorOutput = out.getStderr();
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             result.errorOutput = e.toString();
