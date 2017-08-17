@@ -44,6 +44,14 @@
         <!--unfair="true" runForWholeFile="true" level="WARNING" -->
         <externalAnnotator language="SCSS" implementationClass="com.sasslint.inspection.SassLintExternalAnnotator" />
 
+        <localInspection language="SASS" groupPath="JavaScript" shortName="SassLintInspection"
+                         enabledByDefault="true" level="ERROR"
+                         bundle="com.sasslint.SassLintBundle"
+                         implementationClass="com.sasslint.inspection.SassLintInspection"
+                         displayName="SassLint" groupKey="sasslint.inspection.group.name"/>
+        <!--unfair="true" runForWholeFile="true" level="WARNING" -->
+        <externalAnnotator language="SASS" implementationClass="com.sasslint.inspection.SassLintExternalAnnotator" />
+
         <!-- annotate config file -->
         <projectService serviceImplementation="com.sasslint.config.SassLintConfigFileListener"/>
     </extensions>
