@@ -1,7 +1,7 @@
 <idea-plugin version="2" url="https://github.com/idok/sass-lint-plugin">
     <id>com.wix.sasslint</id>
     <name>Sass Lint</name>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <vendor email="sir_simon_x@yahoo.com" url="https://github.com/idok">Ido</vendor>
     <category>HTML/JavaScript Development</category>
     <description><![CDATA[
@@ -10,6 +10,7 @@
     ]]></description>
 
     <change-notes><![CDATA[
+       <p>1.0.8 Bug fixes.</p>
        <p>1.0.7 Fixed issue https://github.com/idok/sass-lint-plugin/issues/5 with pull request https://github.com/idok/sass-lint-plugin/pull/19.</p>
        <p>1.0.6 Bug fixes.</p>
        <p>1.0.5 Bug fixes.</p>
@@ -37,10 +38,10 @@
         <!-- Add your extensions here -->
         <projectService serviceImplementation="com.sasslint.settings.Settings"/>
         <projectConfigurable implementation="com.sasslint.settings.SassLintSettingsPage"/>
-        <localInspection language="SCSS" groupPath="JavaScript" shortName="SassLintInspection"
+        <localInspection language="SCSS" groupPath="JavaScript" shortName="SassScssLintInspection"
                          enabledByDefault="true" level="ERROR"
                          bundle="com.sasslint.SassLintBundle"
-                         implementationClass="com.sasslint.inspection.SassLintInspection"
+                         implementationClass="com.sasslint.inspection.SassScssLintInspection"
                          displayName="SassLint" groupKey="sasslint.inspection.group.name"/>
         <!--unfair="true" runForWholeFile="true" level="WARNING" -->
         <externalAnnotator language="SCSS" implementationClass="com.sasslint.inspection.SassLintExternalAnnotator" />
