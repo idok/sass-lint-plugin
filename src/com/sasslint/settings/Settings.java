@@ -3,12 +3,13 @@ package com.sasslint.settings;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@State(name = "SassLintProjectComponent",
-        storages = {
-                @Storage(id = "default", file = StoragePathMacros.PROJECT_FILE),
-                @Storage(id = "dir", file = StoragePathMacros.PROJECT_CONFIG_DIR + "/sasslintPlugin.xml", scheme = StorageScheme.DIRECTORY_BASED)})
+@State(
+        name = "SassLintProjectComponent",
+        storages = @Storage("sasslintPlugin.xml")
+)
 public class Settings implements PersistentStateComponent<Settings> {
     public String configFile = "";
     public String rulesPath = "";
@@ -34,7 +35,7 @@ public class Settings implements PersistentStateComponent<Settings> {
     }
 
     @Override
-    public void loadState(Settings state) {
+    public void loadState(@NotNull Settings state) {
         XmlSerializerUtil.copyBean(state, this);
     }
 
