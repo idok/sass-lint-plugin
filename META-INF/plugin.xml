@@ -10,6 +10,7 @@
     ]]></description>
 
     <change-notes><![CDATA[
+       <p>1.1.1 Fix compatibility issues with Idea.</p>
        <p>1.1.0 Fix compatibility issues with Idea.</p>
        <p>1.0.8 Bug fixes.</p>
        <p>1.0.7 Fixed issue https://github.com/idok/sass-lint-plugin/issues/5 with pull request https://github.com/idok/sass-lint-plugin/pull/19.</p>
