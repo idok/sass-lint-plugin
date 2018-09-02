@@ -1,7 +1,7 @@
 <idea-plugin url="https://github.com/idok/sass-lint-plugin">
     <id>com.wix.sasslint</id>
     <name>Sass Lint</name>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <vendor email="sir_simon_x@yahoo.com" url="https://github.com/idok">Ido</vendor>
     <category>HTML/JavaScript Development</category>
     <description><![CDATA[
