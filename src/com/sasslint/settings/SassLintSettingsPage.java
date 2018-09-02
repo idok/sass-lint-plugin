@@ -14,7 +14,7 @@ import com.intellij.ui.TextFieldWithHistory;
 import com.intellij.ui.TextFieldWithHistoryWithBrowseButton;
 import com.intellij.util.NotNullProducer;
 import com.intellij.util.ui.UIUtil;
-import com.intellij.webcore.ui.SwingHelper;
+import com.intellij.util.ui.SwingHelper;
 import com.sasslint.SassLintProjectComponent;
 import com.sasslint.cli.SassLintFinder;
 import com.sasslint.cli.SassLintRunner;
@@ -43,7 +43,6 @@ public class SassLintSettingsPage implements Configurable {
     protected final Project project;
 
     private JCheckBox pluginEnabledCheckbox;
-    //    private JTextField customRulesPathField;
     private JPanel panel;
     private JPanel errorPanel;
     private TextFieldWithHistoryWithBrowseButton sasslintBinField;
@@ -53,23 +52,18 @@ public class SassLintSettingsPage implements Configurable {
     private JRadioButton useProjectConfigRadioButton;
     private HyperlinkLabel usageLink;
     private JLabel sassLintConfigFilePathLabel;
-    //    private JLabel rulesDirectoryLabel;
     private JLabel pathToSasslintBinLabel;
     private JLabel nodeInterpreterLabel;
     private JLabel versionLabel;
-    // private TextFieldWithHistoryWithBrowseButton rulesPathField;
-    // private JLabel rulesDirectoryLabel1;
     private final PackagesNotificationPanel packagesNotificationPanel;
 
     private final JComponent[] comps = {
         sassLintConfigFile,
-        // customRulesPathField,
         searchConfigRadioButton,
         useProjectConfigRadioButton,
         sasslintBinField,
         nodeInterpreterField,
         sassLintConfigFilePathLabel,
-        // rulesDirectoryLabel,
         pathToSasslintBinLabel,
         nodeInterpreterLabel
     };
@@ -178,9 +172,6 @@ public class SassLintSettingsPage implements Configurable {
         validateField(validator, sasslintBinField, false, "Path to sass-lint is invalid {{LINK}}");
         validateField(validator, sassLintConfigFile, true, "Path to config file is invalid {{LINK}}"); //Please correct path to
         validateField(validator, nodeInterpreterField, false, "Path to node interpreter is invalid {{LINK}}");
-//        if (!ValidationUtils.validateDirectory(project, customRulesPathField.getText(), true)) {
-//            validator.add(customRulesPathField, "Path to custom rules is invalid {{LINK}}", FIX_IT);
-//        }
         if (!validator.hasErrors()) {
             getVersion();
         }
@@ -300,7 +291,6 @@ public class SassLintSettingsPage implements Configurable {
         settings.lintExecutable = sasslintBinField.getChildComponent().getText();
         settings.nodeInterpreter = nodeInterpreterField.getChildComponent().getText();
         settings.configFile = getConfigFile();
-//        settings.rulesPath = customRulesPathField.getText();
         if (!project.isDefault()) {
             project.getComponent(SassLintProjectComponent.class).validateSettings();
             DaemonCodeAnalyzer.getInstance(project).restart();
@@ -313,7 +303,6 @@ public class SassLintSettingsPage implements Configurable {
         sasslintBinField.getChildComponent().setText(settings.lintExecutable);
         sassLintConfigFile.getChildComponent().setText(settings.configFile);
         nodeInterpreterField.getChildComponent().setText(settings.nodeInterpreter);
-//        customRulesPathField.setText(settings.rulesPath);
         useProjectConfigRadioButton.setSelected(StringUtils.isNotEmpty(settings.configFile));
         searchConfigRadioButton.setSelected(StringUtils.isEmpty(settings.configFile));
         sassLintConfigFile.setEnabled(useProjectConfigRadioButton.isSelected());

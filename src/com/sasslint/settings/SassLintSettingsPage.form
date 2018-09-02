@@ -133,7 +133,7 @@
     </children>
   </grid>
   <buttonGroups>
-    <group name="eslintrcButtonGroup">
+    <group name="sassLintConfigButtonGroup">
       <member id="bd58b"/>
       <member id="36405"/>
     </group>
